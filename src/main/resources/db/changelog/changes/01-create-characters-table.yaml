@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: denys funderat
+      changes:
+        - createTable:
+            tableName: characters
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: external_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(255)
+              - column:
+                  name: species
+                  type: varchar(255)
+              - column:
+                  name: type
+                  type: varchar(255)
+              - column:
+                  name: gender
+                  type: varchar(255)
+              - column:
+                  name: origin_name
+                  type: varchar(255)
+              - column:
+                  name: origin_url
+                  type: varchar(255)
+              - column:
+                  name: location_name
+                  type: varchar(255)
+              - column:
+                  name: location_url
+                  type: varchar(255)
+              - column:
+                  name: image
+                  type: varchar(255)
+              - column:
+                  name: episodes
+                  type: varchar(10000)
+              - column:
+                  name: url
+                  type: varchar(255)
+              - column:
+                  name: created
+                  type: datetime
