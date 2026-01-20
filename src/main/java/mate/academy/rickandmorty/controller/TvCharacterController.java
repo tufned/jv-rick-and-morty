@@ -1,6 +1,7 @@
 package mate.academy.rickandmorty.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import mate.academy.rickandmorty.dto.internal.TvCharacterDto;
 import mate.academy.rickandmorty.service.TvCharacterService;
@@ -20,7 +21,9 @@ public class TvCharacterController {
     @Operation(summary = "Get all characters", description = """
             Returns all characters wrapped in Pageable.
             Can be used with 'name' search param to get all characters with found name.""")
-    public Page<TvCharacterDto> getAll(String name, Pageable pageable) {
+    public Page<TvCharacterDto> getAll(
+            @Parameter(description = "Used to search by name", example = "Rick") String name,
+            Pageable pageable) {
         return tvCharacterService.getAll(name, pageable);
     }
 

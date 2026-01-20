@@ -34,15 +34,19 @@ public class TvCharacterServiceImpl implements TvCharacterService {
     @Transactional
     @Override
     public TvCharacterDto getRandom() {
-        Optional<TvCharacter> randomTvCharacter = findRandomTvCharacter();
+        long count = tvCharacterRepository.count();
+        if (count == 0) {
+            return null;
+        }
+        Optional<TvCharacter> randomTvCharacter = findRandomTvCharacter(count);
         while (randomTvCharacter.isEmpty()) {
-            randomTvCharacter = findRandomTvCharacter();
+            randomTvCharacter = findRandomTvCharacter(count);
         }
         return tvCharacterMapper.toDto(randomTvCharacter.get());
     }
 
-    private Optional<TvCharacter> findRandomTvCharacter() {
-        long randomId = new Random().nextLong(tvCharacterRepository.count()) + 1;
+    private Optional<TvCharacter> findRandomTvCharacter(long totalCount) {
+        long randomId = new Random().nextLong(totalCount) + 1;
         return tvCharacterRepository.findById(randomId);
     }
 }

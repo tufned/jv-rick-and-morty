@@ -44,10 +44,11 @@ public class ReferenceDataService {
         try {
             while (url != null) {
                 JsonNode jsonNode = fetchAndGetJsonNode(url);
+                responseDtos.addAll(parseCharactersResponse(jsonNode));
                 JsonNode nextField = jsonNode.path("info").path("next");
                 if (!nextField.isMissingNode() && !nextField.isNull()) {
                     url = nextField.asText();
-                    responseDtos.addAll(parseCharactersResponse(jsonNode));
+                    continue;
                 }
                 url = null;
             }
