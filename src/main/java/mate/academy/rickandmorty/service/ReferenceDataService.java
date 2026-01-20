@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.List;
 import mate.academy.rickandmorty.dto.external.TvCharacterApiDto;
 import mate.academy.rickandmorty.mapper.TvCharacterMapper;
@@ -38,27 +39,39 @@ public class ReferenceDataService {
 
     @EventListener(ApplicationReadyEvent.class)
     public void fetchReferenceCharacters() {
-        URI uri = URI.create(referenceApiBaseUrl + "/character");
-        HttpRequest request = HttpRequest.newBuilder().GET().uri(uri).build();
+        String url = referenceApiBaseUrl + "/character";
+        List<TvCharacterApiDto> responseDtos = new ArrayList<>();
         try {
-            HttpResponse<String> response =
-                    httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            JsonNode jsonNode = objectMapper.readTree(response.body());
-            JsonNode resultsField = jsonNode.get("results");
-
-            if (resultsField == null || !resultsField.isArray()) {
-                throw new RuntimeException();
+            while (url != null) {
+                JsonNode jsonNode = fetchAndGetJsonNode(url);
+                JsonNode nextField = jsonNode.path("info").path("next");
+                if (!nextField.isMissingNode() && !nextField.isNull()) {
+                    url = nextField.asText();
+                    responseDtos.addAll(parseCharactersResponse(jsonNode));
+                }
+                url = null;
             }
-
-            CollectionType listType = objectMapper.getTypeFactory()
-                    .constructCollectionType(List.class, TvCharacterApiDto.class);
-            List<TvCharacterApiDto> responseDtos =
-                    objectMapper.convertValue(resultsField, listType);
-
             tvCharacterRepository.saveAll(
                     responseDtos.stream().map(tvCharacterMapper::toModel).toList());
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Can't fetch data from external API", e);
         }
+    }
+
+    private JsonNode fetchAndGetJsonNode(String url) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder().GET().uri(URI.create(url)).build();
+        HttpResponse<String> response =
+                httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        return objectMapper.readTree(response.body());
+    }
+
+    private List<TvCharacterApiDto> parseCharactersResponse(JsonNode jsonNode) {
+        JsonNode resultsField = jsonNode.get("results");
+        if (resultsField == null || !resultsField.isArray()) {
+            throw new RuntimeException();
+        }
+        CollectionType listType = objectMapper.getTypeFactory()
+                .constructCollectionType(List.class, TvCharacterApiDto.class);
+        return objectMapper.convertValue(resultsField, listType);
     }
 }

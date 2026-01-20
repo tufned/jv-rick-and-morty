@@ -6,7 +6,7 @@ public record TvCharacterDto(
         Long id,
         Long externalId,
         String name,
-        String status,
+        TvCharacter.Status status,
         TvCharacter.Gender gender
 ) {
 }

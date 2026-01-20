@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +29,7 @@ public class TvCharacter {
     private Long externalId;
 
     @Schema(example = "Rick Sanchez")
+    @NotNull
     private String name;
 
     @Schema(example = "Alive")
